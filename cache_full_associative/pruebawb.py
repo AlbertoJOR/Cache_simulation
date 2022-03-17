@@ -1,7 +1,7 @@
 import cachearr as charr
 
 if __name__ == "__main__":
-    cache = charr.cachearr(3,True,0)
+    cache = charr.cachearr(3,True,2)
     cache.load('00000018')
     cache.print_cache()
     cache.load('00000028')

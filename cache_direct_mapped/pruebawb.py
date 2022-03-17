@@ -1,6 +1,9 @@
 import cachearr as charr
 
 if __name__ == "__main__":
+    # El objetivo de este código es visualizar los misses y 
+    # hit al usar la política de Write back, con especial énfasis
+    # en la dirección "00000018"
     cache = charr.cachearr(3,True)
     cache.load('00000018')
     cache.print_cache()
@@ -8,13 +11,12 @@ if __name__ == "__main__":
     cache.load('00000004')
     cache.print_cache()
     cache.load('00000018')
-    rn = charr.generate32drnd()
-    cache.write('00000018',rn)
+    cache.write('00000018',charr.generate32drnd())
     cache.print_cache()
 
     cache.load('00000018')
     rn2 = charr.generate32drnd()
-    cache.write('00101018', rn2)
+    cache.write('00101018', charr.generate32drnd())
 
     cache.load('00101018')
 

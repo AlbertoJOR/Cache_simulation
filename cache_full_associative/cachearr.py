@@ -113,7 +113,7 @@ class cachearr():
 
         print()
     
-        print("LIsta", ":", self.cachebank[2**self.numsets])
+        print("Lista  de remplazo", ":", self.cachebank[2**self.numsets])
 
         print()
     def load(self, addr):
@@ -122,21 +122,11 @@ class cachearr():
         Args:
             addr (hex str):
         """
-        # Se obtienen el Tag y el Set de la dirección
+        # Se obtienen el Tag 
         addint = hexToDec(addr)
         binaddr= decimalToBinary(addint,32)
         tag = binaddr[:-2]
 
-
-        # Se extraen las dos líneas pertenecientes al set
-        # ch_line = self.cachebank[0]
-        # ch_line2 = self.cachebank[1]
-        # ch_line3 = self.cachebank[2]
-        # ch_line4 = self.cachebank[3]
-        # ch_line5 = self.cachebank[4]
-        # ch_line6 = self.cachebank[5]
-        # ch_line7 = self.cachebank[6]
-        # ch_line8 = self.cachebank[7]
         for i in range(0, 2** self.numsets):
             if(self.cachebank[i].tag == tag or self.cachebank[i].valid):
                 print("LOAD  hit")
@@ -146,15 +136,7 @@ class cachearr():
                     self.read_LRU(i)
                 print()
                 return 
-        
 
-
-                
-
-        # if((ch_line.valid==0 or(ch_line.tag != tag)) and (ch_line2.valid==0 or(ch_line2.tag != tag))
-        # and (ch_line3.valid==0 or(ch_line3.tag != tag))and (ch_line4.valid==0 or(ch_line4.tag != tag))
-        # and (ch_line5.valid==0 or(ch_line5.tag != tag)) and (ch_line6.valid==0 or(ch_line6.tag != tag))
-        # and (ch_line7.valid==0 or(ch_line7.tag != tag)) and (ch_line8.valid==0 or(ch_line8.tag != tag))):
         print("LOAD: Cache miss")
 
         # buscar el dato en la memoria
@@ -178,38 +160,8 @@ class cachearr():
 
         return
 
-        # else:
-        #     print("LOAD: Cache hit")
-        #     if ch_line.tag == tag:
-        #         print("addr: ", addr, "  data:", ch_line.data)
-        #         i = 0
-        #     elif ch_line2.tag == tag:
-        #         print("addr: ", addr, "  data:", ch_line2.data)
-        #         i = 1
-            
-        #     elif ch_line3.tag == tag:
-        #         print("addr: ", addr, "  data:", ch_line3.data)
-        #         i = 2
-        #     elif ch_line4.tag == tag:
-        #         print("addr: ", addr, "  data:", ch_line4.data)
-        #         i = 3
-        #     elif ch_line5.tag == tag:
-        #         print("addr: ", addr, "  data:", ch_line5.data)
-        #         i = 4
-        #     elif ch_line6.tag == tag:
-        #         print("addr: ", addr, "  data:", ch_line6.data)
-        #         i = 5
-        #     elif ch_line7.tag == tag:
-        #         print("addr: ", addr, "  data:", ch_line7.data)
-        #         i = 6
-        #     else : 
-        #         i = 7
-        #         print("addr: ", addr, "  data:", ch_line8.data)
-        #     if(self.rep_pol == 2 ):
-        #         # Si se unsa LRU se actualiza el dato al más utilizado
-        #         self.read_LRU(i)
 
-    def writeback(self,data, Tag, addr_bin, i_index):
+    def writeback(self,data, Tag, addr_bin):
         """Aplica la escritura con la política de Write Back.
 
         Args:
@@ -219,15 +171,6 @@ class cachearr():
             addr_bin (str bin):
             i_index (int): indicé de la vía de la caché
         """
-
-        # ch_line = self.cachebank[0]
-        # ch_line2= self.cachebank[1]
-        # ch_line3= self.cachebank[2]
-        # ch_line4= self.cachebank[3]
-        # ch_line5= self.cachebank[4]
-        # ch_line6= self.cachebank[5]
-        # ch_line7= self.cachebank[6]
-        # ch_line8= self.cachebank[7]
 
         for i in range(0, 2** self.numsets):
             if(self.cachebank[i].tag ==Tag):
@@ -242,6 +185,7 @@ class cachearr():
 
         print("Write: Cache miss")
         # Escribir en memoria
+        i_index = self.replace( Tag)
         if self.cachebank[i_index].dirtybit :
             print("Replaced data written  in memory")
             self.main_mem[addr_bin] = self.cachebank[i_index].data
@@ -257,7 +201,7 @@ class cachearr():
 
 
 
-    def writethrough(self, data, Tag, addr_bin, ind_block):
+    def writethrough(self, data, Tag, addr_bin):
         """Aplica la política write through
 
         Args:
@@ -267,7 +211,7 @@ class cachearr():
             addr_bin (str bin):
             i_index (int): indicé de la vía de la caché
         """
-
+        ind_block= self.replace( Tag)
         self.cachebank[ind_block].set_atributes(ind_block,1, Tag, data, 0)
 
         # Escribir en memoria 
@@ -275,7 +219,7 @@ class cachearr():
 
     def write( self, addr, data):
         """Método que simula la instrucción de escritura en la caché
-        Aplica la poplítica correspondiente.
+        Aplica la poplítica correspondiente
 
         Args:
             addr (hex str):
@@ -287,11 +231,11 @@ class cachearr():
         # Escribir en la caché
         Tag = addr_bin[:-2]
         
-        i_index = self.replace( Tag)
+        
         if self.wb:
-            self.writeback( data, Tag, addr_bin, i_index)
+            self.writeback( data, Tag, addr_bin )
         else: 
-            self.writethrough( data, Tag, addr_bin, i_index)
+            self.writethrough( data, Tag, addr_bin)
 
         print("Write add:  ", addr, "data:  ", data )
 

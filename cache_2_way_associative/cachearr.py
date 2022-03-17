@@ -121,7 +121,7 @@ class cachearr():
         for i in range(0,2**self.numsets):
             self.cachebank[i][1].print_cache_line()
         for i in range(0, 2**self.numsets):
-            print(i, ":", self.cachebank[i][2])
+            print("Lista de remplazo", i, ":", self.cachebank[i][2])
 
         print()
     def load(self, addr):
@@ -176,7 +176,7 @@ class cachearr():
                 self.read_LRU(ch_set_dec,i)
         print()
 
-    def writeback(self,data, Tag, set_dec, addr_bin, i_index):
+    def writeback(self,data, Tag, set_dec, addr_bin):
         """Aplica la escritura con la política de Write Back.
 
         Args:
@@ -193,6 +193,7 @@ class cachearr():
         if(ch_line.tag != Tag and ch_line2.tag != Tag):
             print("Write: Cache miss")
             # Escribir en memoria
+            i_index = self.replace(set_dec, Tag)
             if self.cachebank[set_dec][i_index].dirtybit :
 
                 print("Replaced data written  in memory")
@@ -223,7 +224,7 @@ class cachearr():
 
 
 
-    def writethrough(self, data, Tag, set_dec, addr_bin, ind_block):
+    def writethrough(self, data, Tag, set_dec, addr_bin):
         """Aplica la política write through
 
         Args:
@@ -233,7 +234,7 @@ class cachearr():
             addr_bin (str bin):
             i_index (int): indicé de la vía de la caché
         """
-
+        ind_block = self.replace(set_dec, Tag)
         self.cachebank[set_dec][ind_block].set_atributes(set_dec, 1, Tag, data, 0)
 
         # Escribir en memoria 
@@ -255,11 +256,11 @@ class cachearr():
         ch_set= addr_bin[-(2+self.numsets):-2]
         set_dec = binaryToDec(ch_set)
 
-        i_index = self.replace(set_dec, Tag)
+        
         if self.wb:
-            self.writeback( data, Tag, set_dec, addr_bin, i_index)
+            self.writeback( data, Tag, set_dec, addr_bin)
         else: 
-            self.writethrough( data, Tag, set_dec, addr_bin, i_index)
+            self.writethrough( data, Tag, set_dec, addr_bin)
 
         print("Write add:  ", addr, "data:  ", data )
 
